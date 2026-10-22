@@ -1,0 +1,70 @@
+# Weekly dependency PRs for the four ecosystems this repo actually ships.
+# Read by GitHub, not by any workflow. Grouped so a quiet week is one PR per
+# ecosystem rather than eleven; the api/web workflows gate every one of them.
+version: 2
+
+updates:
+  # api/pyproject.toml + api/uv.lock. Dependabot's pip ecosystem reads the
+  # PEP 621 dependency table; it does not refresh uv.lock, so a merged bump
+  # needs `cd api && uv lock` before the api workflow will pass --frozen.
+  - package-ecosystem: pip
+    directory: /api
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    open-pull-requests-limit: 5
+    groups:
+      python-minor-and-patch:
+        update-types: [minor, patch]
+    # Majors (a new Node or Python line, TypeScript 7) need a person; minors and patches do not.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+    # Majors (a new Node or Python line, TypeScript 7) need a person; minors and patches do not.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # The `uses:` pins in .github/workflows/*.yml.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    groups:
+      actions:
+        patterns: ["*"]
+    # Majors (a new Node or Python line, TypeScript 7) need a person; minors and patches do not.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Base images in api/Dockerfile and web/Dockerfile. The compose service images
+  # (pgvector, seaweedfs, litellm) are not covered: Dependabot's docker
+  # ecosystem reads Dockerfiles, and docker-compose.yml only from a
+  # docker-compose directory entry, which this repo does not have.
+  - package-ecosystem: docker
+    directories:
+      - /api
+      - /web
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    # Majors (a new Node or Python line, TypeScript 7) need a person; minors and patches do not.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

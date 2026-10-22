@@ -1,0 +1,132 @@
+# Playwright against a real stack. NOT part of the PR gate: these specs drive
+# the actual model behind the LiteLLM/Bedrock gateway and cost roughly $0.50 a
+# run, so they are opt-in — dispatch by hand, or put the `e2e` label on a PR.
+#
+# NOT YET RUNNABLE. It needs an `AWS_ROLE_ARN` repository secret holding the ARN
+# of an IAM role that trusts GitHub's OIDC provider and allows bedrock:Converse
+# / bedrock:InvokeModelWithResponseStream on the three demo models. That role
+# does not exist yet, so the `guard` job below FAILS with a message naming the
+# secret. It used to skip green, which is indistinguishable from a passing run
+# (audit finding 14) — and since this workflow only starts on a dispatch or an
+# `e2e` label, a red X is exactly what the person who asked for it should see.
+# It is not on the required-checks list, so it blocks no merge.
+#
+# To turn it on: create the role and its trust policy (sub =
+# repo:aeisenman/civic-assistant-demo:ref:refs/heads/main and
+# repo:aeisenman/civic-assistant-demo:pull_request), then add the ARN as the
+# AWS_ROLE_ARN secret. Nothing else in this file changes.
+name: e2e
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    # Secrets cannot be read from a job-level `if:`, so the check is a job that
+    # publishes a boolean output. It also filters the label: `types: [labeled]`
+    # fires for every label, not just ours.
+    name: is the OIDC role configured?
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'e2e'
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - id: check
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+        run: |
+          if [ -n "$AWS_ROLE_ARN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "AWS_ROLE_ARN is not set." >> "$GITHUB_STEP_SUMMARY"
+            echo "See the header of .github/workflows/e2e.yml for the role it needs." >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::AWS_ROLE_ARN secret not configured; see scripts/ci/README.md"
+            exit 1
+          fi
+
+  e2e:
+    name: playwright against the live stack
+    needs: guard
+    if: needs.guard.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write # required for the OIDC token exchange below
+    env:
+      COMPOSE_PROJECT_NAME: civic
+      E2E_BASE_URL: http://localhost:3002
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Assume the Bedrock role via OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+          role-session-name: municipality-agent-e2e
+
+      - name: Build the Bedrock env profile
+        # .env.bedrock is the committed template; the LiteLLM container picks up
+        # the OIDC credentials that configure-aws-credentials exported, and the
+        # staff password is a throwaway for this run only.
+        run: |
+          cp .env.bedrock .env
+          sed -i "s|^STAFF_PASSWORD=.*|STAFF_PASSWORD=${{ github.run_id }}-ci|" .env
+          sed -i "s|^WEB_ORIGIN=.*|WEB_ORIGIN=http://localhost:3001,http://localhost:3002|" .env
+
+      - name: Start the stack
+        run: docker compose up -d --build
+
+      - name: Wait for /health
+        run: |
+          for _ in $(seq 1 90); do
+            curl -fsS -m 5 http://localhost:8080/health | grep -q '"status":"ok"' && exit 0
+            sleep 4
+          done
+          docker compose logs api --tail 100
+          echo "::error::the api never reported healthy"
+          exit 1
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Install the Chromium browser
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the e2e specs
+        working-directory: web
+        # playwright.config.ts starts its own dev server on :3002 and reuses one
+        # if it is already listening, so no extra step is needed here.
+        run: npm run test:e2e
+
+      - name: Upload the HTML report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: web/playwright-report/
+          retention-days: 7
+
+      - name: Tear the stack down
+        if: always()
+        run: docker compose down -v --remove-orphans || true

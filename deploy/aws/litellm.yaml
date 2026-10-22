@@ -1,0 +1,70 @@
+# LiteLLM gateway config for the AWS demo profile. It exposes an OpenAI-shaped
+# /v1 on port 4000 and forwards to Bedrock, so api/app/llm/client.py is unchanged.
+# Used by the `litellm` service in docker-compose.yml (profile: aws) with .env.bedrock.
+#
+# The model_name values are the tier aliases .env.bedrock puts in
+# LLM_MODEL_SMALL / SMART / ESCALATE / EXTRACT and EMBED_MODEL, so the swap
+# between providers is only ever an env file, never a code change.
+# Every id is a us-west-2 cross-region inference profile (the `us.` prefix),
+# which is how these models are invoked on this account.
+model_list:
+  # Intent classification and other JSON-only turns: cheap, and routing accuracy
+  # is what the small tier is actually for.
+  - model_name: small
+    litellm_params:
+      model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
+      aws_region_name: us-west-2
+  - model_name: smart
+    litellm_params:
+      model: bedrock/us.anthropic.claude-sonnet-4-6
+      aws_region_name: us-west-2
+  - model_name: escalate
+    litellm_params:
+      model: bedrock/us.anthropic.claude-opus-4-6-v1
+      aws_region_name: us-west-2
+  # Document extraction is a long-context, high-volume, low-judgement job.
+  # Amazon Nova Lite has a 300k window at ~1/16th of Haiku's input price and
+  # filled all 13 fields of the sample business tax form in testing.
+  - model_name: extract
+    litellm_params:
+      model: bedrock/us.amazon.nova-lite-v1:0
+      aws_region_name: us-west-2
+  - model_name: embed
+    litellm_params:
+      model: bedrock/amazon.titan-embed-text-v2:0
+      aws_region_name: us-west-2
+
+router_settings:
+  # Audit finding 9: one gateway, one region, no second model — a Bedrock event
+  # or a throttle on one model took the whole assistant down, and /health stayed
+  # green because it makes no model call.
+  #
+  # Two layers of failover, and they cover different things:
+  #
+  # 1. Cross-region, already on. Every id above carries the `us.` prefix, which
+  #    makes it a cross-region inference profile: Bedrock itself routes the
+  #    request to whichever US region has capacity, so a regional event is
+  #    handled inside Bedrock with nothing to configure here.
+  # 2. Cross-model, below. That does not help when one *model* is throttled —
+  #    Opus has the smallest on-demand quota of the three and is the tier the
+  #    assistant reaches for exactly when a question is hard. `escalate` then
+  #    falls back to `smart` (Sonnet), which answers every escalate-tier prompt
+  #    in this repo, a little less well. A slightly weaker answer beats the
+  #    fallback apology, and the trace still records the alias that was asked
+  #    for, so the dashboard shows how often this fires.
+  #
+  # Deliberately not reversed: `smart` must not fall back to `escalate`, because
+  # a Sonnet throttle would then quietly bill Opus prices on every turn.
+  fallbacks: [{ escalate: ["smart"] }]
+
+litellm_settings:
+  # Bedrock rejects some OpenAI-only parameters; drop them rather than 400.
+  drop_params: true
+
+general_settings:
+  # Read from the environment, never written down here: the value used to be
+  # `sk-litellm-demo` in this file, in docker-compose.yml and in .env.bedrock,
+  # which meant anyone who reached :4000 got unmetered Bedrock on the instance
+  # role. docker-compose.yml passes LITELLM_MASTER_KEY through with `:?` (no
+  # default), and deploy/aws/up.sh generates a fresh one per deploy.
+  master_key: os.environ/LITELLM_MASTER_KEY

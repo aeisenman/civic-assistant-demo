@@ -1,0 +1,115 @@
+# The golden eval set against a real stack, once a night. Report-only where it
+# counts: PLAN.md §14 says report the number and never tune the prompts to it,
+# so the scoring step is `continue-on-error` and this is never a required check.
+#
+# NOT YET RUNNABLE, for the same reason as e2e.yml: it needs the `AWS_ROLE_ARN`
+# repository secret (an IAM role trusting GitHub's OIDC provider, allowed to
+# call Bedrock). Until that exists the `guard` job FAILS the run with a message
+# naming the secret. It used to skip green, which meant a decorative nightly
+# that had never once run and nobody noticed (audit finding 14): a workflow that
+# cannot do its job should look broken, because it is.
+name: eval-nightly
+
+on:
+  # Manual only in the public repo; re-add a schedule once AWS_ROLE_ARN exists:
+  # schedule:
+  #   - cron: "0 9 * * *" # 09:00 UTC, ~02:00 San Diego
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eval-nightly
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    name: is the OIDC role configured?
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - id: check
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+        run: |
+          if [ -n "$AWS_ROLE_ARN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "AWS_ROLE_ARN is not set." >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::AWS_ROLE_ARN secret not configured; see scripts/ci/README.md"
+            exit 1
+          fi
+
+  eval:
+    name: golden set
+    needs: guard
+    if: needs.guard.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      COMPOSE_PROJECT_NAME: civic
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Assume the Bedrock role via OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+          role-session-name: municipality-agent-eval
+
+      - name: Build the Bedrock env profile
+        run: |
+          cp .env.bedrock .env
+          sed -i "s|^STAFF_PASSWORD=.*|STAFF_PASSWORD=${{ github.run_id }}-ci|" .env
+
+      - name: Start the stack
+        run: docker compose up -d --build
+
+      - name: Wait for /health
+        run: |
+          for _ in $(seq 1 90); do
+            curl -fsS -m 5 http://localhost:8080/health | grep -q '"status":"ok"' && exit 0
+            sleep 4
+          done
+          docker compose logs api --tail 100
+          exit 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "api/uv.lock"
+
+      - name: Run the golden set
+        continue-on-error: true
+        working-directory: api
+        run: uv run python -m evals.run --base-url http://localhost:8080
+
+      - name: Summarise into the run page
+        if: always()
+        run: |
+          {
+            echo "### Golden eval — $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo ""
+            python3 scripts/ci/eval_summary.py "api/evals/results/*.json"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the results JSON
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: eval-results
+          path: api/evals/results/*.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Tear the stack down
+        if: always()
+        run: docker compose down -v --remove-orphans || true

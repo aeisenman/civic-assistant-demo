@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+# Node
+node_modules/
+.next/
+# Env & data
+.env
+.env.local
+*.local.toml
+data/volumes/
+# pg_dump + seaweed tars written by scripts/backup.sh: real data, never source.
+data/backups/
+# OS
+.DS_Store
+# Claude scratch
+.claude/settings.local.json
+
+# Eval output is a measurement, not source; keep the directory, drop the runs.
+api/evals/results/*
+!api/evals/results/.gitkeep
+
+# Playwright output (the screenshots in web/e2e/screenshots are tracked)
+playwright-report/
+test-results/
+.claude/worktrees/
+data/demo_up*.log

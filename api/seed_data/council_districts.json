@@ -1,0 +1,84 @@
+[
+  {
+    "district": 1,
+    "councilmember": "(fictional) Priya Nakamura",
+    "neighborhoods": [
+      "La Jolla",
+      "University City",
+      "Torrey Pines"
+    ]
+  },
+  {
+    "district": 2,
+    "councilmember": "(fictional) Marcus Ibarra",
+    "neighborhoods": [
+      "Pacific Beach",
+      "Point Loma",
+      "Ocean Beach"
+    ]
+  },
+  {
+    "district": 3,
+    "councilmember": "(fictional) Dana Whitfield",
+    "neighborhoods": [
+      "Hillcrest",
+      "North Park",
+      "Downtown",
+      "University Heights"
+    ]
+  },
+  {
+    "district": 4,
+    "councilmember": "(fictional) Rashad Okafor",
+    "neighborhoods": [
+      "Encanto",
+      "Skyline",
+      "Southeastern San Diego"
+    ]
+  },
+  {
+    "district": 5,
+    "councilmember": "(fictional) Linda Cho",
+    "neighborhoods": [
+      "Rancho Bernardo",
+      "Scripps Ranch",
+      "Rancho Peñasquitos"
+    ]
+  },
+  {
+    "district": 6,
+    "councilmember": "(fictional) Teresa Vasquez",
+    "neighborhoods": [
+      "Mira Mesa",
+      "Clairemont",
+      "Kearny Mesa"
+    ]
+  },
+  {
+    "district": 7,
+    "councilmember": "(fictional) Brian Sato",
+    "neighborhoods": [
+      "Tierrasanta",
+      "Mission Valley",
+      "Linda Vista"
+    ]
+  },
+  {
+    "district": 8,
+    "councilmember": "(fictional) Alejandra Ruiz",
+    "neighborhoods": [
+      "San Ysidro",
+      "Otay Mesa",
+      "Nestor"
+    ]
+  },
+  {
+    "district": 9,
+    "councilmember": "(fictional) Kevin Marsh",
+    "neighborhoods": [
+      "City Heights",
+      "College Area",
+      "Rolando"
+    ]
+  }
+]

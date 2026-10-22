@@ -1,0 +1,149 @@
+[
+  {
+    "category": "pothole",
+    "label": "Pothole",
+    "department": "Transportation Dept (Streets Division)",
+    "sla_days": 14,
+    "description": "Report a pothole in a City street for repair."
+  },
+  {
+    "category": "sidewalk_repair",
+    "label": "Sidewalk Repair",
+    "department": "Transportation Dept (Streets Division)",
+    "sla_days": 30,
+    "description": "Report a damaged, uplifted, or hazardous sidewalk panel."
+  },
+  {
+    "category": "street_resurfacing",
+    "label": "Street Resurfacing Request",
+    "department": "Transportation Dept (Streets Division)",
+    "sla_days": 180,
+    "description": "Request that a City street be evaluated for resurfacing/repaving."
+  },
+  {
+    "category": "graffiti_removal",
+    "label": "Graffiti Removal",
+    "department": "Transportation Dept / ESD",
+    "sla_days": 7,
+    "description": "Report graffiti on public or private property for removal; a photo speeds triage."
+  },
+  {
+    "category": "streetlight_signal_out",
+    "label": "Streetlight / Traffic Signal Out",
+    "department": "Transportation Dept (Traffic Engineering)",
+    "sla_days": 10,
+    "description": "Report a streetlight that is out or a malfunctioning traffic signal."
+  },
+  {
+    "category": "missed_pickup",
+    "label": "Missed Collection",
+    "department": "Environmental Services Dept (ESD)",
+    "sla_days": 1,
+    "description": "Report a missed trash, recycling, or organics collection; next-business-day dispatch."
+  },
+  {
+    "category": "container_issue",
+    "label": "Container Repair or Replacement",
+    "department": "Environmental Services Dept (ESD)",
+    "sla_days": 7,
+    "description": "Report a broken, missing, or stolen trash/recycling/organics cart."
+  },
+  {
+    "category": "bulky_item",
+    "label": "Bulky Item Pickup",
+    "department": "Environmental Services Dept (ESD)",
+    "sla_days": 10,
+    "description": "Schedule a bulky item pickup (furniture, appliances); limited free pickups per year."
+  },
+  {
+    "category": "household_hazardous_waste",
+    "label": "Household Hazardous Waste",
+    "department": "Environmental Services Dept (ESD)",
+    "sla_days": 14,
+    "description": "Arrange drop-off or collection information for paint, batteries, chemicals, and e-waste."
+  },
+  {
+    "category": "illegal_dumping",
+    "label": "Illegal Dumping",
+    "department": "Environmental Services Dept (ESD)",
+    "sla_days": 7,
+    "description": "Report illegally dumped items or materials on public property; do not handle hazardous materials yourself."
+  },
+  {
+    "category": "homeless_encampment",
+    "label": "Homeless Encampment / Outreach",
+    "department": "Homelessness Strategies & Solutions Dept",
+    "sla_days": 14,
+    "description": "Report an encampment for outreach and, where applicable, cleanup coordination."
+  },
+  {
+    "category": "parking_enforcement",
+    "label": "Parking Enforcement",
+    "department": "Police Dept (Parking Enforcement)",
+    "sla_days": 3,
+    "description": "Report a parking violation for enforcement (blocked driveway, red curb, expired meter, etc.)."
+  },
+  {
+    "category": "abandoned_vehicle",
+    "label": "Abandoned Vehicle",
+    "department": "Police Dept (Parking Enforcement)",
+    "sla_days": 5,
+    "description": "Report a vehicle that appears abandoned on a public street."
+  },
+  {
+    "category": "tree_trimming",
+    "label": "Tree Trimming",
+    "department": "Parks & Recreation Dept",
+    "sla_days": 21,
+    "description": "Request trimming of a City-owned street tree or park tree."
+  },
+  {
+    "category": "weed_abatement",
+    "label": "Weed Abatement",
+    "department": "Parks & Recreation Dept",
+    "sla_days": 21,
+    "description": "Report overgrown weeds or brush on City property posing a fire or access hazard."
+  },
+  {
+    "category": "park_facility_issue",
+    "label": "Park Facility Issue",
+    "department": "Parks & Recreation Dept",
+    "sla_days": 14,
+    "description": "Report a damaged playground, restroom, irrigation, or other park facility issue."
+  },
+  {
+    "category": "stormwater_drainage",
+    "label": "Stormwater / Drainage Issue",
+    "department": "Transportation Dept (Stormwater Division)",
+    "sla_days": 14,
+    "description": "Report a clogged storm drain, flooding, or drainage problem."
+  },
+  {
+    "category": "ada_accessibility",
+    "label": "ADA Accessibility Complaint",
+    "department": "ADA Compliance / Transportation",
+    "sla_days": 14,
+    "description": "Report a missing curb ramp or other accessibility barrier in the public right-of-way."
+  },
+  {
+    "category": "stro_code_enforcement",
+    "label": "STRO Violation / Code Enforcement",
+    "department": "Development Services Dept (Code Enforcement)",
+    "sla_days": 30,
+    "description": "Report a suspected short-term rental (STRO) violation or a property/building code enforcement issue."
+  },
+  {
+    "category": "dead_animal_removal",
+    "label": "Dead Animal Removal",
+    "department": "ESD / Animal Services",
+    "sla_days": 2,
+    "description": "Report a dead animal on a public street (ESD) or private property (Animal Services)."
+  },
+  {
+    "category": "other",
+    "label": "Other / Uncategorized",
+    "department": "City Clerk / General Services",
+    "sla_days": 10,
+    "description": "Catch-all for requests that don't fit another category; routed to manual triage."
+  }
+]

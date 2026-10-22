@@ -1,0 +1,57 @@
+# Lint and unit tests for the FastAPI service. Runs on every PR and on main.
+# No service containers: tests/conftest.py forces LIVE_DATA_ENABLED off and the
+# suite mocks httpx and the LLM client, so there is no db, no S3 and no model.
+name: api
+
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - ".github/workflows/api.yml"
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - ".github/workflows/api.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: ruff + pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: api
+    env:
+      # Belt and braces: conftest.py sets this too, but a future test that
+      # imports app.config directly should still never reach sandiego.gov.
+      LIVE_DATA_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v7
+
+      # Exact version, not a major tag: astral-sh stopped publishing floating
+      # major tags after v7, so "v10" does not resolve. Dependabot bumps it.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "api/uv.lock"
+
+      - name: Sync the locked environment
+        run: uv sync --frozen
+
+      - name: ruff check
+        run: uv run ruff check .
+
+      - name: ruff format --check
+        run: uv run ruff format --check .
+
+      - name: pytest
+        run: uv run pytest -q

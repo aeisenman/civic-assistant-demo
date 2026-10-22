@@ -1,0 +1,210 @@
+[
+  {
+    "tracking_number": "PRM-2026-000101",
+    "type": "permit",
+    "status": "rejected",
+    "fields": {
+      "applicant_name": "Maria Gutierrez",
+      "applicant_email": "maria.gutierrez@example.com",
+      "applicant_phone": "619-555-0110",
+      "project_address": "4521 Adams Ave, San Diego, CA 92116",
+      "apn": "445-210-11-00",
+      "permit_type": "No-Plan Building Permit",
+      "project_description": "Like-for-like replacement of the rear water heater and connecting lines.",
+      "valuation_usd": 4200,
+      "square_feet": 40,
+      "contractor_name": "Kensington Plumbing Co.",
+      "contractor_license": "C36-441207",
+      "owner_builder": false
+    },
+    "department": "Development Services Department",
+    "fee_cents": 41102
+  },
+  {
+    "tracking_number": "PRM-2026-000102",
+    "type": "permit",
+    "status": "in_review",
+    "fields": {
+      "applicant_name": "Kevin Park",
+      "applicant_email": "kevin.park@example.com",
+      "applicant_phone": "619-555-0128",
+      "project_address": "3355 University Ave, San Diego, CA 92104",
+      "apn": "452-330-04-00",
+      "permit_type": "Building Permit with Plans",
+      "project_description": "Second-storey addition with two bedrooms and a bathroom.",
+      "valuation_usd": 185000,
+      "square_feet": 620,
+      "contractor_name": "North Park Builders",
+      "contractor_license": "B-551043",
+      "owner_builder": false
+    },
+    "department": "Development Services Department",
+    "fee_cents": 74000
+  },
+  {
+    "tracking_number": "PRM-2026-000103",
+    "type": "permit",
+    "status": "needs_info",
+    "missing_fields": ["valuation_usd"],
+    "fields": {
+      "applicant_name": "Angela Ruiz",
+      "applicant_email": "angela.ruiz@example.com",
+      "applicant_phone": "619-555-0134",
+      "project_address": "1234 Cedar St, San Diego, CA 92101",
+      "apn": "533-421-08-00",
+      "permit_type": "Accessory Dwelling Unit (ADU)",
+      "project_description": "New detached 640 sq ft accessory dwelling unit in the rear yard.",
+      "valuation_usd": null,
+      "square_feet": 640,
+      "contractor_name": null,
+      "contractor_license": null,
+      "owner_builder": true
+    },
+    "department": "Development Services Department",
+    "fee_cents": null
+  },
+  {
+    "tracking_number": "PRM-2026-000104",
+    "type": "permit",
+    "status": "issued",
+    "fields": {
+      "applicant_name": "David Chen",
+      "applicant_email": "david.chen@example.com",
+      "applicant_phone": "858-555-0163",
+      "project_address": "7890 Girard Ave, San Diego, CA 92037",
+      "apn": "351-118-22-00",
+      "permit_type": "Solar PV (Residential)",
+      "project_description": "Rooftop 7.2 kW solar photovoltaic system on a single-family home.",
+      "valuation_usd": 18000,
+      "square_feet": 380,
+      "contractor_name": "Sunline Energy Partners",
+      "contractor_license": "C46-620118",
+      "owner_builder": false
+    },
+    "department": "Development Services Department",
+    "fee_cents": 32500
+  },
+  {
+    "tracking_number": "BTC-2026-000201",
+    "type": "business_tax",
+    "status": "approved",
+    "fields": {
+      "business_name": "Cedar Street Coffee Cart LLC",
+      "dba": "Cedar Street Coffee Cart",
+      "owner_name": "Priya Raman",
+      "business_address": "1234 Cedar St, San Diego, CA 92101",
+      "mailing_address": "1234 Cedar St, San Diego, CA 92101",
+      "start_date": "2026-08-01",
+      "business_type": "Mobile coffee cart",
+      "naics_code": "722515",
+      "employees": 3,
+      "ownership_type": "llc",
+      "sellers_permit_number": "101-889012",
+      "contact_email": "priya@example.com",
+      "contact_phone": "619-555-0155"
+    },
+    "department": "Office of the City Treasurer",
+    "fee_cents": 4241
+  },
+  {
+    "tracking_number": "BTC-2026-000202",
+    "type": "business_tax",
+    "status": "in_review",
+    "fields": {
+      "business_name": "Convoy Street Ramen Bar Inc.",
+      "dba": "Convoy Street Ramen Bar",
+      "owner_name": "Hiroshi Tanaka",
+      "business_address": "3760 Convoy St, San Diego, CA 92111",
+      "mailing_address": "3760 Convoy St, San Diego, CA 92111",
+      "start_date": "2026-09-01",
+      "business_type": "Restaurant",
+      "naics_code": "722511",
+      "employees": 15,
+      "ownership_type": "corporation",
+      "sellers_permit_number": "101-556677",
+      "contact_email": "hiroshi@example.com",
+      "contact_phone": "858-555-0191"
+    },
+    "department": "Office of the City Treasurer",
+    "fee_cents": 22605
+  },
+  {
+    "tracking_number": "SR-2026-000301",
+    "type": "service_request",
+    "status": "closed",
+    "fields": {
+      "category": "pothole",
+      "address": "3355 University Ave, San Diego, CA 92104",
+      "description": "Large pothole blocking the bike lane near University Ave and 30th St.",
+      "contact_email": "reporter@example.com",
+      "contact_phone": null,
+      "photo_note": null,
+      "council_district": 3
+    },
+    "department": "Transportation Dept (Streets Division)",
+    "fee_cents": 0
+  },
+  {
+    "tracking_number": "SR-2026-000302",
+    "type": "service_request",
+    "status": "in_review",
+    "fields": {
+      "category": "graffiti_removal",
+      "address": "555 Market St, San Diego, CA 92101",
+      "description": "Graffiti tagging on the retaining wall facing the alley.",
+      "contact_email": null,
+      "contact_phone": null,
+      "photo_note": "Photo taken from the alley side, uploaded with the report.",
+      "council_district": 3
+    },
+    "department": "Transportation Dept / ESD",
+    "fee_cents": 0
+  },
+  {
+    "tracking_number": "STR-2026-000401",
+    "type": "stro",
+    "status": "in_review",
+    "fields": {
+      "host_name": "Elena Moreau",
+      "contact_email": "elena.moreau@example.com",
+      "contact_phone": "619-555-0182",
+      "property_address": "3355 University Ave, San Diego, CA 92104",
+      "unit_type": "single_family",
+      "tier": "tier3",
+      "host_resides_onsite": false,
+      "nights_offered_per_year": 180,
+      "owner_or_agent": "owner",
+      "tot_certificate_number": "TOT-2026-114502",
+      "rental_unit_btc_number": "RUBT-2026-33871",
+      "local_contact_name": "Marcus Webb",
+      "local_contact_phone": "619-555-0198",
+      "attestation_accepted": true
+    },
+    "department": "Office of the City Treasurer",
+    "fee_cents": 117000
+  },
+  {
+    "tracking_number": "STR-2026-000402",
+    "type": "stro",
+    "status": "issued",
+    "certificate_s3_key": null,
+    "fields": {
+      "host_name": "Tomas Delgado",
+      "contact_email": "tomas.delgado@example.com",
+      "contact_phone": "858-555-0146",
+      "property_address": "7890 Girard Ave, San Diego, CA 92037",
+      "unit_type": "condo",
+      "tier": "tier2",
+      "host_resides_onsite": true,
+      "nights_offered_per_year": 60,
+      "owner_or_agent": "owner",
+      "tot_certificate_number": "TOT-2026-109887",
+      "rental_unit_btc_number": "RUBT-2026-31220",
+      "local_contact_name": "Tomas Delgado",
+      "local_contact_phone": "858-555-0146",
+      "attestation_accepted": true
+    },
+    "department": "Office of the City Treasurer",
+    "fee_cents": 31700
+  }
+]

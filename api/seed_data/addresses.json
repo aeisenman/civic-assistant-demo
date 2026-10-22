@@ -1,0 +1,242 @@
+[
+  {
+    "address": "4890 Clairemont Dr",
+    "zip": "92117",
+    "zone_id": "Z01",
+    "council_district": 6
+  },
+  {
+    "address": "2100 Moraga Ave",
+    "zip": "92117",
+    "zone_id": "Z01",
+    "council_district": 6
+  },
+  {
+    "address": "3150 Damon Ave",
+    "zip": "92110",
+    "zone_id": "Z01",
+    "council_district": 6
+  },
+  {
+    "address": "1002 Grand Ave",
+    "zip": "92109",
+    "zone_id": "Z02",
+    "council_district": 2
+  },
+  {
+    "address": "3780 Mission Blvd",
+    "zip": "92109",
+    "zone_id": "Z02",
+    "council_district": 2
+  },
+  {
+    "address": "4550 Ingraham St",
+    "zip": "92109",
+    "zone_id": "Z02",
+    "council_district": 2
+  },
+  {
+    "address": "1745 Diamond St",
+    "zip": "92109",
+    "zone_id": "Z02",
+    "council_district": 2
+  },
+  {
+    "address": "7890 Girard Ave",
+    "zip": "92037",
+    "zone_id": "Z03",
+    "council_district": 1
+  },
+  {
+    "address": "8620 Villa La Jolla Dr",
+    "zip": "92037",
+    "zone_id": "Z03",
+    "council_district": 1
+  },
+  {
+    "address": "4150 Regents Park Row",
+    "zip": "92122",
+    "zone_id": "Z03",
+    "council_district": 1
+  },
+  {
+    "address": "3760 Convoy St",
+    "zip": "92111",
+    "zone_id": "Z04",
+    "council_district": 7
+  },
+  {
+    "address": "9500 Aero Dr",
+    "zip": "92123",
+    "zone_id": "Z04",
+    "council_district": 7
+  },
+  {
+    "address": "2033 Ruffin Rd",
+    "zip": "92111",
+    "zone_id": "Z04",
+    "council_district": 7
+  },
+  {
+    "address": "3355 University Ave",
+    "zip": "92104",
+    "zone_id": "Z05",
+    "council_district": 3
+  },
+  {
+    "address": "1234 Cedar St",
+    "zip": "92101",
+    "zone_id": "Z05",
+    "council_district": 3
+  },
+  {
+    "address": "555 Market St",
+    "zip": "92101",
+    "zone_id": "Z05",
+    "council_district": 3
+  },
+  {
+    "address": "3067 University Ave",
+    "zip": "92104",
+    "zone_id": "Z05",
+    "council_district": 3
+  },
+  {
+    "address": "4343 30th St",
+    "zip": "92116",
+    "zone_id": "Z05",
+    "council_district": 3
+  },
+  {
+    "address": "4521 Adams Ave",
+    "zip": "92116",
+    "zone_id": "Z06",
+    "council_district": 9
+  },
+  {
+    "address": "4499 Kensington Dr",
+    "zip": "92116",
+    "zone_id": "Z06",
+    "council_district": 9
+  },
+  {
+    "address": "3960 Felton St",
+    "zip": "92105",
+    "zone_id": "Z06",
+    "council_district": 9
+  },
+  {
+    "address": "2125 Camino Del Rio N",
+    "zip": "92108",
+    "zone_id": "Z07",
+    "council_district": 7
+  },
+  {
+    "address": "7020 Linda Vista Rd",
+    "zip": "92111",
+    "zone_id": "Z07",
+    "council_district": 7
+  },
+  {
+    "address": "1640 Camino De La Reina",
+    "zip": "92108",
+    "zone_id": "Z07",
+    "council_district": 7
+  },
+  {
+    "address": "5500 Campanile Dr",
+    "zip": "92115",
+    "zone_id": "Z08",
+    "council_district": 9
+  },
+  {
+    "address": "4645 College Ave",
+    "zip": "92115",
+    "zone_id": "Z08",
+    "council_district": 9
+  },
+  {
+    "address": "6210 Rolando Blvd",
+    "zip": "92115",
+    "zone_id": "Z08",
+    "council_district": 9
+  },
+  {
+    "address": "3150 Byron St",
+    "zip": "92107",
+    "zone_id": "Z09",
+    "council_district": 2
+  },
+  {
+    "address": "2900 Cañon St",
+    "zip": "92106",
+    "zone_id": "Z09",
+    "council_district": 2
+  },
+  {
+    "address": "4907 Voltaire St",
+    "zip": "92107",
+    "zone_id": "Z09",
+    "council_district": 2
+  },
+  {
+    "address": "3838 Nimitz Blvd",
+    "zip": "92106",
+    "zone_id": "Z09",
+    "council_district": 2
+  },
+  {
+    "address": "3120 Ocean View Blvd",
+    "zip": "92113",
+    "zone_id": "Z10",
+    "council_district": 4
+  },
+  {
+    "address": "5075 Federal Blvd",
+    "zip": "92114",
+    "zone_id": "Z10",
+    "council_district": 4
+  },
+  {
+    "address": "2450 Imperial Ave",
+    "zip": "92102",
+    "zone_id": "Z10",
+    "council_district": 4
+  },
+  {
+    "address": "2400 Coronado Ave",
+    "zip": "92154",
+    "zone_id": "Z11",
+    "council_district": 8
+  },
+  {
+    "address": "8650 Airway Rd",
+    "zip": "92154",
+    "zone_id": "Z11",
+    "council_district": 8
+  },
+  {
+    "address": "700 E San Ysidro Blvd",
+    "zip": "92173",
+    "zone_id": "Z11",
+    "council_district": 8
+  },
+  {
+    "address": "16780 Bernardo Center Dr",
+    "zip": "92128",
+    "zone_id": "Z12",
+    "council_district": 5
+  },
+  {
+    "address": "13260 Black Mountain Rd",
+    "zip": "92129",
+    "zone_id": "Z12",
+    "council_district": 5
+  },
+  {
+    "address": "11700 Bernardo Plaza Ct",
+    "zip": "92128",
+    "zone_id": "Z12",
+    "council_district": 5
+  }
+]

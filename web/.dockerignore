@@ -1,0 +1,13 @@
+# Kept out of the build context. node_modules and .next are rebuilt inside the
+# image; the Playwright files are a dev tool (and would pull a Chromium);
+# .DS_Store is Finder litter that invalidates the COPY layer on every build.
+node_modules
+.next
+npm-debug.log
+README.md
+.git
+.DS_Store
+e2e
+playwright.config.ts
+playwright-report
+test-results

@@ -1,0 +1,159 @@
+[
+  {
+    "zone_id": "Z01",
+    "name": "Clairemont / Bay Park",
+    "trash_day": "Monday",
+    "recycling_week": "A",
+    "organics_week": "B",
+    "zips": [
+      "92110",
+      "92111",
+      "92117"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Monday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z02",
+    "name": "Pacific Beach / Mission Beach",
+    "trash_day": "Monday",
+    "recycling_week": "B",
+    "organics_week": "A",
+    "zips": [
+      "92107",
+      "92109"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Monday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z03",
+    "name": "La Jolla / University City",
+    "trash_day": "Tuesday",
+    "recycling_week": "A",
+    "organics_week": "B",
+    "zips": [
+      "92037",
+      "92121",
+      "92122",
+      "92161"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Tuesday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z04",
+    "name": "Kearny Mesa / Serra Mesa",
+    "trash_day": "Tuesday",
+    "recycling_week": "B",
+    "organics_week": "A",
+    "zips": [
+      "92123",
+      "92124",
+      "92145"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Tuesday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z05",
+    "name": "North Park / University Heights",
+    "trash_day": "Wednesday",
+    "recycling_week": "A",
+    "organics_week": "B",
+    "zips": [
+      "92103",
+      "92104"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Wednesday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z06",
+    "name": "Normal Heights / Kensington",
+    "trash_day": "Wednesday",
+    "recycling_week": "B",
+    "organics_week": "A",
+    "zips": [
+      "92105",
+      "92116"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Wednesday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z07",
+    "name": "Mission Valley / Linda Vista",
+    "trash_day": "Thursday",
+    "recycling_week": "A",
+    "organics_week": "B",
+    "zips": [
+      "92108",
+      "92119",
+      "92120"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Thursday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z08",
+    "name": "College Area / Rolando",
+    "trash_day": "Thursday",
+    "recycling_week": "B",
+    "organics_week": "A",
+    "zips": [
+      "92115"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Thursday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z09",
+    "name": "Point Loma / Ocean Beach",
+    "trash_day": "Friday",
+    "recycling_week": "A",
+    "organics_week": "B",
+    "zips": [
+      "92101",
+      "92106",
+      "92132",
+      "92135",
+      "92140"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Friday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z10",
+    "name": "Southeastern San Diego",
+    "trash_day": "Friday",
+    "recycling_week": "B",
+    "organics_week": "A",
+    "zips": [
+      "92102",
+      "92113",
+      "92114",
+      "92139"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Friday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z11",
+    "name": "San Ysidro / Otay Mesa",
+    "trash_day": "Monday",
+    "recycling_week": "A",
+    "organics_week": "B",
+    "zips": [
+      "92154",
+      "92173"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Monday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  },
+  {
+    "zone_id": "Z12",
+    "name": "Rancho Bernardo / Rancho Peñasquitos",
+    "trash_day": "Tuesday",
+    "recycling_week": "B",
+    "organics_week": "A",
+    "zips": [
+      "92126",
+      "92127",
+      "92128",
+      "92129",
+      "92130",
+      "92131"
+    ],
+    "notes": "Trash and organics (green bin) are collected every week on Tuesday; recycling (blue bin) is collected every other week on the same day, and looking up your address tells you which weeks are yours. No collection on New Year's Day, Memorial Day, Labor Day, Thanksgiving, or Christmas; if a holiday falls on a weekday, that day's route and every remaining route that week shift one day later. The ZIP codes listed for this zone are a fictional demo mapping, not the City's real collection map: confirm your own day at getitdone.sandiego.gov/CollectionMapLookup."
+  }
+]

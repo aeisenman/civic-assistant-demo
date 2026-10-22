@@ -1,0 +1,14 @@
+== smoke against http://localhost:8080 (session smoke-1788799489)
+PASS  health is ok
+      (signed in as City Staff)
+PASS  uploaded sample_permit_application.pdf (document 24)
+PASS  chat filed the permit as PRM-2026-000402
+PASS  PRM-2026-000402 reached in_review
+PASS  advanced PRM-2026-000402 to approved
+PASS  advanced PRM-2026-000402 to issued
+PASS  certificate for PRM-2026-000402 downloads as a PDF
+PASS  PRM-2026-000403 stopped at needs_info
+PASS  PRM-2026-000403 reached in_review after the follow-up
+PASS  chat filed the business tax application as BTC-2026-000400
+PASS  BTC-2026-000400 has an estimated fee of $43.88
+== 0 failure(s)

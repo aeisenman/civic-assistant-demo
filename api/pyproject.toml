@@ -1,0 +1,75 @@
+[project]
+name = "civic-api"
+version = "0.1.0"
+description = "Municipality agent API for the City of San Diego demo"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "pgvector>=0.3.6",
+    "pydantic-settings>=2.6",
+    "openai>=1.60",
+    "boto3>=1.35",
+    "pypdf>=5.1",
+    "reportlab>=4.2",
+    "python-multipart>=0.0.20",
+    "httpx>=0.27",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    # Lint + format, pinned so "ruff clean" means the same thing here and in CI
+    # (.github/workflows/api.yml runs `uv run ruff check .` on every PR).
+    "ruff>=0.14",
+]
+
+[tool.uv]
+# The app is run as a module from /app, not installed as a distribution.
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    # The 40-stream load test. It needs a real Postgres and spawns a stub model
+    # server, so it is not part of `pytest -q`; `pytest -m load` runs it. The -m
+    # in addopts is overridden by an -m on the command line (last one wins).
+    "load: concurrency test against a live database and the CI stub model",
+]
+addopts = ["-m", "not load"]
+
+[tool.ruff]
+# 110 rather than the default 88: the existing code has long docstring lines and
+# SQL strings, and rewrapping them for a linter would hurt readability.
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F  pycodestyle + pyflakes: the baseline every Python project wants.
+# I    import sorting, so diffs never argue about import order.
+# B    bugbear: mutable defaults, `except` that swallows, loop-variable capture.
+# UP   pyupgrade: keep the syntax at the 3.12 the image actually runs.
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.lint.flake8-bugbear]
+# B008 exists because `def f(x=[])` shares one list across calls. FastAPI's
+# `Depends(...)`/`File(...)` markers are the framework's declared way to write a
+# dependency and are read once at import; rewriting them to satisfy B008 would
+# break routing. Told here rather than with 16 `# noqa` comments.
+extend-immutable-calls = [
+    "fastapi.Body",
+    "fastapi.Cookie",
+    "fastapi.Depends",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Header",
+    "fastapi.Path",
+    "fastapi.Query",
+]

@@ -1,0 +1,55 @@
+# Type-check, lint and production build for the Next.js app, on every PR and main.
+# Nothing here talks to the API: NEXT_PUBLIC_API_URL is only inlined into the
+# bundle at build time, so a dummy localhost value is enough to prove it builds.
+name: web
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: typecheck + lint + build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          # Matches web/Dockerfile's node:22.23.2-alpine base.
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: tsc --noEmit
+        run: npm run typecheck
+
+      - name: eslint
+        run: npm run lint
+
+      - name: next build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080

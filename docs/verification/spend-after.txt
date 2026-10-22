@@ -1,0 +1,5 @@
+== app-side estimate (traces.cost_usd, all time) ==
+428 turns, $7.9617 estimated; today $0.6203
+== AWS Cost Explorer, Bedrock, month to date (unblended) ==
+0.004068285
+Budget for phase 2 testing: $10.00 (author, 2026-09-05). Log each run in STATE.md 'Spend ledger'.

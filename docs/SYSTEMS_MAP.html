@@ -1,0 +1,546 @@
+<title>Municipality Agent Systems Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #F6F7F5;
+    --panel: #FFFFFF;
+    --ink: #1C2633;
+    --ink-2: #4A5563;
+    --ink-3: #7A8592;
+    --line: #CBD2DA;
+    --line-soft: #E3E8EC;
+    --accent: #1F5FA8;
+    --accent-soft: #E4EDF8;
+    --off: #A8731C;
+    --off-soft: #FBF1DC;
+    --web-tint: #EEF3F0;
+    --api-tint: #F1F4F8;
+    --llm-tint: #F4F1F8;
+    --data-tint: #EEF4F4;
+    --live-tint: #F8F3EC;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #131820;
+      --panel: #1B222C;
+      --ink: #E8ECF1;
+      --ink-2: #B4BDC8;
+      --ink-3: #7F8A97;
+      --line: #3A4553;
+      --line-soft: #2A333F;
+      --accent: #6FA8E8;
+      --accent-soft: #1E2E44;
+      --off: #D9A64A;
+      --off-soft: #3A2E17;
+      --web-tint: #17211D;
+      --api-tint: #171E29;
+      --llm-tint: #1E1A28;
+      --data-tint: #152023;
+      --live-tint: #241E16;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #131820;
+    --panel: #1B222C;
+    --ink: #E8ECF1;
+    --ink-2: #B4BDC8;
+    --ink-3: #7F8A97;
+    --line: #3A4553;
+    --line-soft: #2A333F;
+    --accent: #6FA8E8;
+    --accent-soft: #1E2E44;
+    --off: #D9A64A;
+    --off-soft: #3A2E17;
+    --web-tint: #17211D;
+    --api-tint: #171E29;
+    --llm-tint: #1E1A28;
+    --data-tint: #152023;
+    --live-tint: #241E16;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  code, .mono {
+    font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+
+  /* Fixed-width sheet, scaled to fit the viewport by script. */
+  #fit { overflow: hidden; }
+  .page {
+    position: relative;
+    width: 1628px;
+    padding: 22px 24px 18px;
+    transform-origin: top left;
+  }
+
+  /* Header */
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+  .head h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .head .thesis { margin: 0; color: var(--ink-2); font-size: 13px; max-width: 900px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .chip {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--ink-2);
+    background: var(--panel);
+    white-space: nowrap;
+  }
+  .chip.off { border-style: dashed; border-color: var(--off); color: var(--off); background: var(--off-soft); }
+
+  /* Lanes */
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 70px 600px 70px 500px;
+    align-items: stretch;
+  }
+  .lane {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 12px 14px 14px;
+  }
+  .lane.web  { background: var(--web-tint); }
+  .lane.api  { background: var(--api-tint);  grid-column: 3; }
+  .stack     { display: flex; flex-direction: column; gap: 14px; }
+  .stack.left  { grid-column: 1; }
+  .stack.right { grid-column: 5; }
+  .stack > .lane:last-child { flex: 1; }
+  .lane.llm  { background: var(--llm-tint); }
+  .lane.data { background: var(--data-tint); }
+  .lane.live { background: var(--live-tint); }
+
+  .lane-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .lane-head h2 {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .lane-head .stack-name { font-size: 11px; color: var(--ink-2); text-align: right; }
+
+  .boxes { display: grid; gap: 8px; }
+  .box {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    padding: 8px 10px 9px;
+    min-width: 0;
+  }
+  .box.off { border-style: dashed; border-color: var(--off); }
+  .box h3 {
+    margin: 0 0 3px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .box h3 code { font-weight: 400; }
+  .box p { margin: 0; color: var(--ink-2); overflow-wrap: break-word; }
+  .list span { display: inline-block; margin-right: 9px; }
+  .box p + p { margin-top: 3px; }
+  .box .tag { color: var(--off); font-size: 10.5px; font-weight: 500; white-space: nowrap; }
+
+  .persona { display: flex; gap: 8px; margin-bottom: 10px; }
+  .persona span {
+    flex: 1;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 5px 8px;
+    background: var(--panel);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .persona b { display: block; color: var(--ink); font-weight: 600; font-size: 12px; }
+
+  /* API internals */
+  .sub { margin: 12px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+  .sub:first-of-type { margin-top: 0; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 7px 9px 8px;
+    min-width: 0;
+  }
+  .step .n { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent); }
+  .step h4 { margin: 1px 0 3px; font-size: 12px; font-weight: 600; }
+  .step p { margin: 0; color: var(--ink-2); font-size: 11.5px; }
+  .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .spine { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; align-items: center; }
+  .spine code {
+    border: 1px solid var(--line-soft);
+    border-radius: 2px;
+    padding: 1px 5px;
+    font-size: 11px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .spine i { font-style: normal; color: var(--ink-3); font-size: 11px; }
+  .spine-row { display: flex; gap: 10px; align-items: baseline; margin-top: 8px; }
+  .spine-row .k { font-size: 11px; font-weight: 600; white-space: nowrap; color: var(--ink-2); }
+  .spine-row .spine { margin-top: 0; }
+  .spine span { white-space: nowrap; display: inline-flex; gap: 3px; align-items: center; }
+  .nw { white-space: nowrap; }
+  .endpoints { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+  .endpoints code { line-height: 1.8; }
+  .endpoints .list span { margin-right: 12px; }
+
+  /* LLM tiles */
+  .tiers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; }
+  .tier {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-top: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 6px 7px 7px;
+    min-width: 0;
+  }
+  .tier .t { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent); }
+  .tier b { display: block; font-size: 11px; font-weight: 600; margin: 1px 0 2px; }
+  .tier span { display: block; font-size: 10.5px; color: var(--ink-2); }
+  .swap { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+  .swap p { margin: 0; color: var(--ink-2); font-size: 11.5px; }
+  .swap code { color: var(--ink); }
+
+  /* Data tables */
+  .tables { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 6px; }
+  .tgroup { min-width: 0; }
+  .tgroup b { display: block; font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+  .tgroup code { display: block; line-height: 1.55; }
+
+  /* Footer */
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 11px;
+  }
+  .foot .legend { display: flex; gap: 16px; align-items: center; }
+  .foot .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .key-line { width: 26px; height: 0; border-top: 2px solid var(--accent); }
+  .key-dash { width: 26px; height: 10px; border: 1px dashed var(--off); border-radius: 2px; }
+
+  /* Connector overlay */
+  #wires { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  #wires > path { fill: none; stroke: var(--accent); stroke-width: 1.6; }
+  #wires marker path { fill: var(--accent); stroke: none; }
+  #wires .lbl { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--ink-2); }
+</style>
+
+<div id="fit">
+<div class="page" id="page">
+  <div class="head">
+    <div>
+      <h1>Municipality Agent</h1>
+      <p class="thesis">Resident assistant for the City of San Diego. A chat turn is classified, routed to a model tier, answered from City records by tool calls and from policy text by retrieval, then written to a trace. A form or document in the chat starts a back-office workflow.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">docker compose · 5 containers: web, api, db, seaweedfs, litellm</span>
+      <span class="chip">ports 3001 / 8080 / 5433 / 8333 / 4000</span>
+      <span class="chip">one <code>.env</code> file selects the model provider</span>
+      <span class="chip off">AWS path: <code>deploy/aws/up.sh</code>, EC2 + instance role, scripted, not run</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT STACK -->
+    <div class="stack left">
+    <section class="lane web" id="lane-web">
+      <div class="lane-head"><h2>Front end</h2><span class="stack-name">Next.js 16 · React 19 · :3001</span></div>
+      <div class="persona">
+        <span><b>Resident</b>chat, upload, forms</span>
+        <span><b>City staff</b>queue, traces, login</span>
+      </div>
+      <div class="boxes">
+        <div class="box" id="web-chat">
+          <h3>Chat <code>/</code></h3>
+          <p>Streams the reply token by token. Shows citations, an inline form, a trace drawer per reply.</p>
+          <p><code>fetch + ReadableStream → /api/chat/stream</code></p>
+        </div>
+        <div class="box">
+          <h3>Staff console <code>/staff</code></h3>
+          <p>Queue polled every 5 s with fields, timeline, Advance buttons, certificate link. Dashboard: turns, cost, latency, intents, tools, applications, unanswered questions.</p>
+        </div>
+        <div class="box">
+          <h3>Traces <code>/staff/traces</code></h3>
+          <p>Last 100 turns: intent, tier, model, tokens, cost, latency, tool calls, retrieved chunks.</p>
+        </div>
+        <div class="box">
+          <h3>Login <code>/login</code></h3>
+          <p>Staff pages call <code>/api/auth/me</code> on load; a 401 redirects here. Residents get an HMAC cookie on first contact that binds the conversation to the browser.</p>
+        </div>
+        <div class="box">
+          <h3>Build</h3>
+          <p>Tailwind 4, no UI kit. <code>NEXT_PUBLIC_API_URL</code> is a Docker build arg. 23 Playwright e2e tests.</p>
+        </div>
+      </div>
+    </section>
+
+      <section class="lane live" id="lane-live">
+        <div class="lane-head"><h2>Live City data</h2><span class="stack-name"><code>app/live/</code> · httpx · seed fallback</span></div>
+        <div class="boxes">
+          <div class="box">
+            <h3>Geocoder <code>ArcGIS</code></h3>
+            <p>City locator <code>Locators/StreetAddress</code>. Seed addresses first, then geocode, then bare ZIP. One resolver serves every address tool.</p>
+          </div>
+          <div class="box">
+            <h3>Map layers <code>webmaps.sandiego.gov</code></h3>
+            <p>Council districts, street sweeping, zoning, permits filed at an address.</p>
+          </div>
+          <div class="box">
+            <h3>Council agendas <code>Granicus RSS</code></h3>
+            <p>Merged into <code>search_events</code> beside the seed events.</p>
+          </div>
+          <div class="box off">
+            <h3>Web search <span class="tag">off in demo</span></h3>
+            <p>Brave search limited to <code>*.sandiego.gov</code>; fetched pages become citable sources. <code>SEARCH_PROVIDER=none</code>.</p>
+          </div>
+          <div class="box">
+            <h3>Guard <code>app/live/http.py</code></h3>
+            <p>4 s timeout, 10 min cache, None on any failure. A dead City service degrades to seed data, never a 500. Each trace marks a result <code>live</code> or <code>seed</code>. <code>LIVE_DATA_ENABLED=false</code> turns the module off; tests run that way.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- API -->
+    <section class="lane api" id="lane-api">
+      <div class="lane-head"><h2>API</h2><span class="stack-name">FastAPI · Python 3.12 · SQLAlchemy 2 async · asyncpg · uv · :8080</span></div>
+
+      <div class="sub">One chat turn, in order</div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><h4>Guards, then intake</h4><p>Bounds, per-IP bucket, session cookie, turn and cost caps, a stream slot or 429. A file drop or a needs-info reply is a workflow turn, templated.</p></div>
+        <div class="step"><span class="n">2</span><h4>Classify</h4><p>Small tier returns JSON: intent, confidence, complexity, secondary intents. Last 3 messages as context.</p></div>
+        <div class="step"><span class="n">3</span><h4>Select tier</h4><p>Escalate when confidence &lt; 0.6, complexity high, or a second intent. Else smart. Reason goes on the trace.</p></div>
+        <div class="step"><span class="n">4</span><h4>Profile</h4><p>One per intent: system prompt, tool allow-list, KB topic. 7 intents.</p></div>
+        <div class="step"><span class="n">5</span><h4>Retrieve</h4><p>pgvector cosine top 8 + full-text top 8, fused by reciprocal rank fusion, top 5 cited as [n].</p></div>
+        <div class="step"><span class="n">6</span><h4>Tool loop</h4><p>At most 4 rounds. Repeated calls served from a per-turn cache. Any tool failure becomes an error the model can read.</p></div>
+        <div class="step"><span class="n">7</span><h4>Cite and trace</h4><p>Citations mapped back to sources. One <code>traces</code> row: tier, model, tokens, latency, cost.</p></div>
+        <div class="step"><span class="n">8</span><h4>Stream</h4><p>Server-sent events: status, tool, token, done, a heartbeat every 15 s. Only the final answer round reaches the resident.</p></div>
+      </div>
+
+      <div class="sub">Modules</div>
+      <div class="three">
+        <div class="box">
+          <h3>Tools <code>app/tools/</code></h3>
+          <p>16 tools. Records come from tools, policy from retrieval. Pydantic input models derive the JSON schema.</p>
+          <p class="list"><code><span>get_trash_schedule</span> <span>get_next_pickup</span> <span>estimate_permit_fee</span> <span>estimate_business_tax</span> <span>search_events</span> <span>get_council_district</span> <span>get_application_status</span> <span>create_service_request</span> <span>get_referral</span> <span>start_application</span></code></p>
+        </div>
+        <div class="box">
+          <h3>Workflow engine <code>app/workflows/</code></h3>
+          <p>State machine for permit, business tax, service request, STRO licence. Row-locked advance; worker claims rows every 3 s with SKIP LOCKED. Issue stores the certificate before the status commits.</p>
+        </div>
+        <div class="box">
+          <h3>Intake and auth</h3>
+          <p>Document: pypdf text, field extraction on the extract tier, validation, submit. Form: schema from <code>/api/forms/{type}</code>, same validator.</p>
+          <p>Staff login: scrypt hash, 12 h HttpOnly cookie, 429 after 5 failures. Inline form: Idempotency-Key, 60 s dedupe.</p>
+        </div>
+      </div>
+
+      <div class="spine-row">
+        <span class="k">Application states</span>
+        <div class="spine">
+          <span><code>submitted</code><i>›</i></span><span><code>validating</code><i>›</i></span><span><code>needs_info | routed</code><i>›</i></span><span><code>in_review</code><i>›</i></span><span><code>approved | rejected</code><i>›</i></span><span><code>issued</code><i>›</i></span><span><code>closed</code></span>
+        </div>
+      </div>
+
+      <div class="sub">Process</div>
+      <div class="three">
+        <div class="box">
+          <h3>Startup order</h3>
+          <p>Migrations, S3 bucket, seed data, KB ingest when <code>kb_chunks</code> is empty, then the worker.</p>
+        </div>
+        <div class="box">
+          <h3>Traces <code>one row per turn</code></h3>
+          <p>Intent, tier, model, router reason, chunk ids, tool calls with <code>live</code> or <code>seed</code>, tokens, latency, cost from <code>LLM_PRICES_JSON</code>.</p>
+        </div>
+        <div class="box">
+          K2 golden questions in 6 categories: standard, adversarial, multi-turn, multi-intent, hardening, production. Scores intent, tool choice, citations, keywords, guardrails, no invented numbers. Reports, never gates.</p>
+        </div>
+      </div>
+
+      <div class="endpoints">
+        <code class="list"><span>POST /api/chat</span> <span>POST /api/chat/stream</span> <span>POST /api/documents</span> <span>GET|POST /api/applications</span> <span>POST /api/applications/{id}/advance</span> <span>GET /api/forms/{type}</span> <span>GET /api/traces</span> <span>/api/auth/login|me|logout</span> <span>GET /api/reports/summary</span> <span>GET /health</span> <span>GET /health/deep</span></code>
+      </div>
+    </section>
+
+    <!-- RIGHT STACK -->
+    <div class="stack right">
+      <section class="lane llm" id="lane-llm">
+        <div class="lane-head"><h2>Model layer</h2><span class="stack-name">openai SDK · LiteLLM :4000 · Amazon Bedrock us-west-2</span></div>
+        <div class="boxes" style="grid-template-columns: 1fr 1fr;">
+          <div class="box">
+            <h3>Client <code>app/llm/client.py</code></h3>
+            <p>The only module that calls a model. Speaks the OpenAI protocol to <code>LLM_BASE_URL</code>. Every call is tiered, timed, priced, and traced.</p>
+          </div>
+          <div class="box">
+            <h3>Gateway <code>litellm</code></h3>
+            <p>Maps tier aliases to Bedrock model ids. Drops parameters Bedrock rejects. Starts only under the <code>aws</code> compose profile.</p>
+          </div>
+        </div>
+        <div class="tiers">
+          <div class="tier"><span class="t">small</span><b>Claude Haiku 4.5</b><span>Intent classification and other JSON-only tasks.</span></div>
+          <div class="tier"><span class="t">smart</span><b>Claude Sonnet 4.6</b><span>Resident answers with tools and retrieval.</span></div>
+          <div class="tier"><span class="t">escalate</span><b>Claude Opus 4.6</b><span>Low confidence, high complexity, multi-intent turns.</span></div>
+          <div class="tier"><span class="t">extract</span><b>Amazon Nova Lite</b><span>Form field extraction. 300k context, 1/16 the Haiku input price.</span></div>
+          <div class="tier"><span class="t">embed</span><b>Titan Embed v2</b><span>Embeds KB chunks and queries. 1024 d.</span></div>
+        </div>
+        <div class="swap">
+          <p><b>Provider swap is an env file.</b> <code>.env.ollama</code>: host Ollama, qwen2.5 3b / 7b / 7b-32k, nomic-embed-text 768 d. <code>.env.openai</code>: gpt-5-mini, gpt-5. Code unchanged. A new embedding width needs a fresh database.</p>
+        </div>
+      </section>
+
+      <section class="lane data" id="lane-data">
+        <div class="lane-head"><h2>Data layer</h2><span class="stack-name">Postgres 16 + pgvector :5433 · SeaweedFS S3 :8333</span></div>
+        <div class="boxes" style="grid-template-columns: 1fr 1fr;">
+          <div class="box" style="grid-column: 1 / 3;">
+            <h3>Postgres <code>pgvector/pgvector:pg16</code></h3>
+            <p>One store for records, vectors, and full text. Plain SQL migrations applied at startup.</p>
+            <div class="tables">
+              <div class="tgroup"><b>Records</b><code>applications<br>application_events<br>documents<br>chat_messages<br>traces<br>staff_sessions · rate_limits</code></div>
+              <div class="tgroup"><b>Seed</b><code>trash_zones<br>addresses<br>events<br>permit_types<br>service_categories<br>referrals<br>council_districts</code></div>
+              <div class="tgroup"><b>Knowledge base</b><code>kb_documents<br>kb_chunks<br>embedding vector(1024) hnsw<br>tsv tsvector</code></div>
+            </div>
+          </div>
+          <div class="box">
+            <h3>SeaweedFS <code>S3 via boto3</code></h3>
+            <p>Bucket <code>civic-docs</code>. Keys <code>documents/&lt;id&gt;/&lt;file&gt;</code>, <code>certificates/&lt;tracking&gt;.pdf</code>. Pointing <code>S3_ENDPOINT</code> at AWS is the whole change for real S3.</p>
+          </div>
+          <div class="box">
+            <h3>Sources on disk</h3>
+            <p><code>api/kb/*.md</code>: 9 topic files, split by heading into 133 chunks and embedded at startup. <code>api/seed_data/*.json</code>: 40 addresses, 12 collection zones, 9 council districts.</p>
+          </div>
+          <div class="box" style="grid-column: 1 / 3;">
+            <h3>Migrations <code>app/db/migrations/</code></h3>
+            <p>Plain SQL files applied in filename order under an advisory lock, tracked in <code>schema_migrations</code>, with down files and a rollback flag. The vector width is asserted at startup against <code>EMBED_DIM</code>.</p>
+          </div>
+          <div class="box">
+            <h3>Chunking <code>rag/ingest.py</code></h3>
+            <p>Each <code>### Q:</code> FAQ block is one chunk. Prose under <code>##</code> is packed into 1200-character windows with 150 of overlap, on paragraph boundaries. Every chunk text starts with its title and heading.</p>
+          </div>
+          <div class="box">
+            <h3>Volumes and reset</h3>
+            <p>Bind mounts <code>data/volumes/pg</code> and <code>data/volumes/seaweed</code> keep state across restarts. <code>backup.sh</code> runs before every reset; <code>restore.sh</code> is the drill.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="legend">
+      <span><i class="key-line"></i>request path</span>
+      <span><i class="key-dash"></i>built, switched off or not run</span>
+    </div>
+    <div>Verified 2026-09-20: pytest 584 · smoke.sh 13/13 · Playwright 23/23 · golden set 132 items · 20 concurrent streams on Bedrock in 9 s, zero errors</div>
+  </div>
+
+  <svg id="wires" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)" stroke="none"></path>
+      </marker>
+    </defs>
+  </svg>
+</div>
+</div>
+
+<script>
+(function () {
+  var page = document.getElementById('page');
+  var fit = document.getElementById('fit');
+  var svg = document.getElementById('wires');
+  var NS = 'http://www.w3.org/2000/svg';
+
+  // Element position relative to the sheet; the sheet is the only positioned ancestor.
+  function rect(id) {
+    var el = document.getElementById(id);
+    return { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+  }
+
+  function wire(fromId, toId, label, yFromId) {
+    var a = rect(fromId), b = rect(toId);
+    var yr = yFromId ? rect(yFromId) : null;
+    var y = yr ? yr.y + yr.h / 2 : b.y + b.h / 2;
+    var leftward = b.x < a.x;
+    var x1 = leftward ? a.x - 2 : a.x + a.w + 2;
+    var x2 = leftward ? b.x + b.w + 2 : b.x - 2;
+    var p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', 'M' + x1 + ',' + y + ' L' + x2 + ',' + y);
+    p.setAttribute('marker-end', 'url(#arrow)');
+    svg.appendChild(p);
+
+    var t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'lbl');
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('x', (x1 + x2) / 2);
+    t.setAttribute('y', y - 6);
+    t.textContent = label;
+    svg.appendChild(t);
+  }
+
+  function draw() {
+    svg.querySelectorAll(':scope > path, :scope > text').forEach(function (n) { svg.removeChild(n); });
+    svg.setAttribute('width', page.offsetWidth);
+    svg.setAttribute('height', page.offsetHeight);
+    wire('lane-web', 'lane-api', 'HTTP + SSE', 'web-chat');
+    wire('lane-api', 'lane-live', 'httpx 4 s');
+    wire('lane-api', 'lane-llm', 'openai SDK');
+    wire('lane-api', 'lane-data', 'SQL · S3');
+  }
+
+  function scale() {
+    var s = Math.min(1, (window.innerWidth - 16) / page.offsetWidth);
+    page.style.transform = 'scale(' + s + ')';
+    fit.style.height = (page.offsetHeight * s) + 'px';
+  }
+
+  function all() { draw(); scale(); }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(all); }
+  window.addEventListener('load', all);
+  window.addEventListener('resize', all);
+  all();
+})();
+</script>

@@ -1,0 +1,165 @@
+# Dependency, image and secret scanning. Runs on every PR and once a week, so a
+# CVE published after a PR merges still gets reported without anyone opening one.
+# GitHub's own secret scanning and push protection are free only on public
+# repos; this repo is private, so gitleaks is the free path.
+#
+# pip-audit and npm audit read dependency *manifests*. Trivy reads the built
+# image, which is the only job here that can see a CVE in the python:3.12-slim
+# or node:22-alpine base layer underneath them (audit finding 15).
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Mondays 06:17 UTC. Odd minute on purpose: the top of the hour is the
+    # busiest slot on the shared cron scheduler and gets delayed.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # gitleaks-action lists the PR's commits through the API; without this it is a 403.
+  pull-requests: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pip-audit:
+    name: python dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "api/uv.lock"
+
+      - name: pip-audit the locked runtime dependencies
+        working-directory: api
+        # --no-dev: a CVE in pytest is not a CVE in the shipped image.
+        # --no-hashes / --no-deps / --disable-pip together mean "audit exactly
+        # these versions": uv already resolved the full transitive set, so
+        # pip-audit must not re-resolve it (which builds a throwaway venv and
+        # reaches PyPI for every package).
+        run: |
+          set -o pipefail
+          uv export --frozen --no-dev --no-hashes |
+            uvx pip-audit --no-deps --disable-pip -r /dev/stdin
+
+  npm-audit:
+    name: node dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: npm audit
+        working-directory: web
+        # Reported, not fatal. At the time this workflow landed `npm audit
+        # --audit-level=high` was clean (0 vulnerabilities of any severity) in
+        # web/package-lock.json, so this is a soft gate only so that a fresh
+        # advisory against next/react cannot block an unrelated PR at 2am. The
+        # step summary below is where it shows up; promote it to a hard failure
+        # (drop the `|| true` and the summary block) once someone owns triage.
+        run: |
+          set -o pipefail
+          npm audit --audit-level=high | tee audit.txt || AUDIT_FAILED=1
+          {
+            echo "### npm audit (web)"
+            echo ""
+            echo '```'
+            tail -20 audit.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${AUDIT_FAILED:-0}" = "1" ]; then
+            echo "::warning::npm audit reported high or critical advisories — see the job summary"
+          fi
+
+  trivy:
+    name: image scan (${{ matrix.image }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      # Both images get scanned even when one of them is already failing: the
+      # point of this job is a complete CVE picture, not the first bad news.
+      fail-fast: false
+      matrix:
+        include:
+          - image: civic-api
+            context: ./api
+          - image: civic-web
+            context: ./web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build ${{ matrix.image }}
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.context }}
+          load: true
+          tags: ${{ matrix.image }}:scan
+          build-args: |
+            NEXT_PUBLIC_API_URL=http://localhost:8080
+          # Its own cache scope, shared with nothing: compose-smoke's scopes are
+          # per-EMBED_DIM leg and this job runs on a different trigger.
+          cache-from: type=gha,scope=scan-${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=scan-${{ matrix.image }}
+
+      - name: Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ matrix.image }}:scan
+          scan-type: image
+          format: table
+          severity: HIGH,CRITICAL
+          # ignore-unfixed: a CVE with no patched version in the distro is not
+          # something a rebuild can clear, so failing on it would mean a red
+          # check nobody can turn green. `trivy image --ignore-unfixed=false`
+          # locally is how to see the full list before a base-image bump.
+          ignore-unfixed: true
+          # A hard gate, unlike npm audit: an unpatched HIGH in a base layer is
+          # exactly the thing that ships silently today, and the fix (bump the
+          # pinned base tag in the Dockerfile) is a one-line PR.
+          exit-code: "1"
+        env:
+          # The vulnerability database comes from a public registry that rate
+          # limits anonymous pulls; these are the mirrors the action documents.
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db
+
+  gitleaks:
+    name: secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history: a secret committed and then removed is still a secret.
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The action runs `gitleaks detect --redact`, so a finding shows the
+          # file and rule but never prints the secret into a public build log.
+          GITLEAKS_ENABLE_SUMMARY: true
+          GITLEAKS_ENABLE_COMMENTS: false
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+          # GITLEAKS_LICENSE is only needed for repos owned by an organisation.
+          # This repo belongs to a personal account, so no key is required.

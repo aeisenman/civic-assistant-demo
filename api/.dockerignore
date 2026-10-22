@@ -1,0 +1,12 @@
+# Kept out of the build context (and therefore out of the image and its layer
+# cache). tests/ and evals/results/ are dev artefacts the running API never
+# reads; the caches are host-specific and invalidate the COPY layer on every
+# build; .DS_Store is Finder litter that does the same.
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+tests/
+evals/results/

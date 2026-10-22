@@ -1,0 +1,215 @@
+# Whole demo stack: Postgres+pgvector (records, vectors, full-text), SeaweedFS
+# (S3 API for uploaded documents and generated certificates), the FastAPI API,
+# the Next.js web app, and (profile `aws`) a LiteLLM gateway in front of Bedrock.
+# Ports are off the defaults (3001/8080/5433/8333) because 3000/8000/5432 are
+# taken on the dev Mac. Reads .env — copy one of .env.ollama/.env.openai/.env.bedrock.
+#
+# Host port policy (M16): only the two ports a human opens in a browser are on
+# 0.0.0.0 — api :8080 and web :3001. Postgres and the SeaweedFS S3 API bind to
+# 127.0.0.1, which is all `scripts/spend.sh`, `psql -h localhost -p 5433` and the
+# worktree agents ever needed; SeaweedFS's master UI (9333) and filer UI (8888)
+# are not published at all, because nothing outside the compose network uses them
+# and neither has any authentication.
+#
+# Image pins (checked 2026-09-14, see also deploy/aws/README.md):
+#   pgvector/pgvector:pg16          unchanged — pg16 is the line the migrations target
+#   chrislusf/seaweedfs:4.47        latest SeaweedFS release (tagged 2026-09-14)
+#   ghcr.io/berriai/litellm:v1.100.1  latest stable v* release (2026-09-10); the
+#                                   old `main-latest` was a moving tag, so two
+#                                   builds a week apart were not the same gateway
+# A digest would be stricter still; a readable version tag plus this dated note is
+# the trade this demo makes, and re-pinning is a one-line diff.
+
+# Every service gets the same log rotation. Without it the default json-file
+# driver is unbounded: one API log loop on the 40 GB EC2 volume fills the disk and
+# takes Postgres down with it. 10m x 3 is 30 MB a service, 150 MB for the stack.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_USER: civic
+      POSTGRES_PASSWORD: civic
+      POSTGRES_DB: civic
+    ports:
+      # Loopback only. `scripts/spend.sh` and any psql on the host still reach it
+      # at localhost:5433; nothing on the LAN does.
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - ./data/volumes/pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U civic -d civic"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          # Postgres holds the pgvector index and the KB chunks; 1g is comfortable
+          # for this dataset and leaves room on a t3.large for the other four.
+          memory: 1g
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.47
+    restart: unless-stopped
+    logging: *logging
+    # One process runs master+volume+filer+S3. -ip=seaweedfs makes the volume
+    # server advertise a hostname the other containers can resolve; the small
+    # volume size limit keeps the ./data/volumes/seaweed directory tidy.
+    command: server -s3 -filer -dir=/data -ip=seaweedfs -master.volumeSizeLimitMB=64 -volume.max=0
+    ports:
+      # S3 API, loopback only: boto3 in the api container goes over the compose
+      # network, so the published port exists purely for host-side debugging.
+      # 9333 (master UI) and 8888 (filer UI) are deliberately not published —
+      # both are unauthenticated and both list every stored object.
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - ./data/volumes/seaweed:/data
+    healthcheck:
+      # -ip=seaweedfs makes it bind that address, not loopback, so the probe
+      # has to use the service name too. This is inside the compose network and
+      # is unaffected by 9333 no longer being published on the host.
+      test: ["CMD-SHELL", "wget -q -O - http://seaweedfs:9333/cluster/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    logging: *logging
+    ports:
+      - "8080:8080"
+    env_file: .env
+    environment:
+      # The image is UTC, so every bare date.today() in the container was a day
+      # ahead of the City from 4 pm Pacific. app/clock.py is the belt; this is
+      # the braces — it also fixes the timestamps in the container's own logs,
+      # which is what an operator reads at 5 pm when something breaks.
+      TZ: America/Los_Angeles
+    # Lets the container reach Ollama running on the host Mac.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      # /health is the cheap one: process + db + s3 + kb count, zero model calls.
+      # It answers 503 when db or s3 is down, and urlopen raises on 4xx/5xx, so a
+      # degraded API is an unhealthy container and `web` will not start behind it.
+      # start_period is generous because startup applies migrations, seeds, and
+      # embeds the whole knowledge base before it serves.
+      test:
+        ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    depends_on:
+      db:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_healthy
+      # Only present under the `aws` profile. `required: false` means the
+      # default (Ollama) path neither starts it nor waits for it, while the
+      # Bedrock path blocks the API until the gateway answers — the API embeds
+      # the whole knowledge base during startup, so it cannot come up first.
+      litellm:
+        condition: service_healthy
+        required: false
+    deploy:
+      resources:
+        limits:
+          # The KB embedding pass and pypdf extraction are the two peaks; 1.5g is
+          # roughly 3x the steady-state RSS measured on the demo stack.
+          memory: 1.5g
+
+  web:
+    # Next.js app (M4). NEXT_PUBLIC_* is inlined by `next build`, so the API URL
+    # is a build arg; the runtime env var is kept only so `docker compose config`
+    # shows what the image was built with.
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    restart: unless-stopped
+    logging: *logging
+    ports:
+      - "3001:3000"
+    environment:
+      # Browser-side calls go to the host-published API port.
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    healthcheck:
+      # Node 22 has a global fetch, and the runner image has no curl or wget.
+      test:
+        ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    depends_on:
+      api:
+        # Was a bare `- api`, which only waits for the container to be created:
+        # the web app would render while the API was still embedding the KB, and
+        # the first fetch failed. service_healthy waits for /health to be green.
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+# The AWS profile swaps Ollama for Bedrock behind a LiteLLM gateway that speaks
+# the OpenAI protocol, so only .env changes. It sits behind the `aws` compose
+# profile: `.env.ollama` leaves it out, and `.env.bedrock` sets
+# COMPOSE_PROFILES=aws so the same plain command brings it up.
+#   cp .env.bedrock .env && docker compose up -d --build
+# Credentials: on the EC2 host deploy/aws/up.sh attaches a Bedrock-only instance
+# role and boto3 finds it through the metadata service. Locally, one credentials
+# file is mounted read-only — see the volume comment below.
+  litellm:
+    image: ghcr.io/berriai/litellm:v1.100.1
+    profiles: ["aws"]
+    restart: unless-stopped
+    logging: *logging
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    ports:
+      - "127.0.0.1:4000:4000"
+    volumes:
+      - ./deploy/aws/litellm.yaml:/app/config.yaml:ro
+      # Was `~/.aws:/root/.aws:ro`, which handed this container the developer's
+      # entire AWS identity — every profile, every account — while it processes
+      # untrusted resident text. Now it is one file, read-only, and AWS_PROFILE
+      # below selects one entry from it: point AWS_SHARED_CREDENTIALS_FILE at a
+      # file whose profile can do nothing but Bedrock inference
+      # (deploy/aws/README.md has the two commands that create one).
+      - ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}:/root/.aws/credentials:ro
+    environment:
+      AWS_REGION: us-west-2
+      # Should name a Bedrock-only profile. On EC2 the file holds an empty
+      # [default] section and boto3 falls through to the instance role.
+      AWS_PROFILE: ${AWS_PROFILE:-default}
+      # `:?` on purpose: no default, so a stack that forgot to set a gateway key
+      # fails to start instead of running with the value that is in git. Every
+      # committed .env.* sets it, including .env.ci, because compose interpolates
+      # the whole file before it filters on profiles.
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY in .env}
+    healthcheck:
+      # /health/liveliness needs no master key. The image has python but no
+      # curl or wget, so the probe is a one-liner in the interpreter it ships.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 1g

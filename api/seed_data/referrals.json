@@ -1,0 +1,116 @@
+[
+  {
+    "topic": "Dog licensing",
+    "agency": "San Diego Humane Society / County Animal Services",
+    "url": "https://www.sandiegocounty.gov/das/license-laws/license.html",
+    "note": "Dog licensing is handled by the County/Humane Society, not the City."
+  },
+  {
+    "topic": "Stray, loose or injured animal",
+    "agency": "San Diego Humane Society (the City's animal control partner)",
+    "url": "https://www.sandiego.gov/park-and-recreation/activities/animalservices",
+    "note": "Call 619-299-7012 extension 1, staffed 24 hours a day, to report a stray, loose, injured or aggressive dog or cat. A dead animal on a public street is a Get It Done report instead."
+  },
+  {
+    "topic": "Voter registration",
+    "agency": "County Registrar of Voters",
+    "url": "https://www.sdvote.com",
+    "note": "Register or check your registration status online through the County."
+  },
+  {
+    "topic": "Property tax payment",
+    "agency": "County Treasurer-Tax Collector",
+    "url": "https://www.sdttc.com",
+    "note": "Property tax bills and payments are issued by the County, not the City."
+  },
+  {
+    "topic": "Vehicle registration / driver's license",
+    "agency": "CA Department of Motor Vehicles",
+    "url": "https://www.dmv.ca.gov",
+    "note": "Vehicle registration and driver's licenses are a State (DMV) function."
+  },
+  {
+    "topic": "Small claims / traffic court",
+    "agency": "Superior Court of California, San Diego",
+    "url": "https://www.sdcourt.ca.gov",
+    "note": "Court matters, including contesting a traffic citation, go through the Superior Court."
+  },
+  {
+    "topic": "Passport application",
+    "agency": "US Department of State",
+    "url": "https://travel.state.gov",
+    "note": "Some City library branches serve as passport acceptance facilities; the application itself is federal."
+  },
+  {
+    "topic": "Marriage license",
+    "agency": "County Assessor/Recorder/County Clerk",
+    "url": "https://www.sdarcc.gov",
+    "note": "Marriage licenses are issued by the County Clerk, not the City."
+  },
+  {
+    "topic": "Gas / electric utility billing",
+    "agency": "SDG&E (private utility)",
+    "url": "https://www.sdge.com",
+    "note": "Gas and electric service is provided by a private utility, not the City."
+  },
+  {
+    "topic": "Food facility health permit",
+    "agency": "County Dept of Environmental Health & Quality (DEHQ)",
+    "url": "https://www.sandiegocounty.gov/content/sdc/deh/fhd/food/food.html",
+    "note": "Restaurant and food facility health permits are issued by the County."
+  },
+  {
+    "topic": "Fictitious Business Name (DBA) filing",
+    "agency": "County Assessor/Recorder/County Clerk",
+    "url": "https://www.sdarcc.gov/content/arcc/en/misc-forms/fictitious-business-name.html",
+    "note": "File a DBA with the County if your business name isn't just your legal name plus a description."
+  },
+  {
+    "topic": "Seller's Permit (sales/use tax)",
+    "agency": "California Dept of Tax and Fee Administration (CDTFA)",
+    "url": "https://www.cdtfa.ca.gov/services/registration.htm",
+    "note": "Required to sell or lease tangible goods subject to CA sales tax; free and usually instant online."
+  },
+  {
+    "topic": "Business entity registration (LLC/Corp/LP)",
+    "agency": "CA Secretary of State",
+    "url": "https://www.sos.ca.gov/business-programs",
+    "note": "Forming an LLC, corporation, or LP is a State filing, separate from the City's Business Tax Certificate."
+  },
+  {
+    "topic": "Employer ID Number (EIN)",
+    "agency": "Internal Revenue Service (IRS)",
+    "url": "https://www.irs.gov/businesses/small-businesses-self-employed",
+    "note": "EINs are issued by the federal government, free of charge."
+  },
+  {
+    "topic": "State payroll tax employer registration",
+    "agency": "CA Employment Development Department (EDD)",
+    "url": "https://www.edd.ca.gov",
+    "note": "Register as an employer for state payroll tax withholding through EDD."
+  },
+  {
+    "topic": "Contractor state license",
+    "agency": "Contractors State License Board (CSLB)",
+    "url": "https://www.cslb.ca.gov",
+    "note": "Contractor licensing is a State function, separate from any City building permit."
+  },
+  {
+    "topic": "Trolley/bus station parking",
+    "agency": "San Diego Metropolitan Transit System (MTS)",
+    "url": "https://www.sdmts.com/transit-services/transit-station-parking",
+    "note": "MTS is a separate regional transit agency, not a City department; station park-and-ride lots are 24-hour, no overnight RV parking."
+  },
+  {
+    "topic": "Rental assistance / Section 8 housing",
+    "agency": "San Diego Housing Commission (SDHC)",
+    "url": "https://sdhc.org/housing-opportunities/help-with-your-rent/",
+    "note": "SDHC is a separate public agency from the City that administers rental assistance and affordable housing programs, not something processed at City Hall."
+  },
+  {
+    "topic": "Tenant rights / eviction / rent increase disputes",
+    "agency": "Legal Aid Society of San Diego",
+    "url": "https://www.lassd.org",
+    "note": "The City doesn't adjudicate landlord-tenant disputes; Legal Aid Society offers free or low-cost help for renters."
+  }
+]

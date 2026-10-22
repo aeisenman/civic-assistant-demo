@@ -1,0 +1,169 @@
+# Proves the images build and the whole default stack actually works: migrations
+# run, the seed loader fills Postgres, S3 is reachable, /health turns green, the
+# web container serves, and scripts/smoke.sh drives a real application from the
+# inline form to an issued certificate PDF. No model is billed — LLM_BASE_URL
+# points at scripts/ci/stub_openai.py on the runner host, reached from the
+# container through compose's host-gateway alias.
+#
+# Two matrix legs, 768 and 1024. EMBED_DIM is baked into the vector column by
+# migration 002 and prod runs Titan v2 at 1024 while the local Ollama profile is
+# 768, so a change that only works at one width used to ship green (audit
+# finding 10). The stub follows the matrix through --embed-dim.
+name: compose-smoke
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compose-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # An explicit project name fixes the image names compose looks for, so the
+  # pre-built (cached) images below are reused instead of rebuilt on `up`.
+  COMPOSE_PROJECT_NAME: civic
+
+jobs:
+  compose-smoke:
+    name: build + up + smoke (embed ${{ matrix.embed_dim }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      # Independent legs: a 1024 failure must not hide a 768 result or vice versa.
+      fail-fast: false
+      matrix:
+        embed_dim: [768, 1024]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      # A cache scope per leg: both legs build the same image, but they run at
+      # the same time, and two concurrent mode=max exports into one scope race.
+      - name: Build the api image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./api
+          load: true
+          tags: civic-api:latest
+          cache-from: type=gha,scope=api-${{ matrix.embed_dim }}
+          cache-to: type=gha,mode=max,scope=api-${{ matrix.embed_dim }}
+
+      - name: Build the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./web
+          load: true
+          tags: civic-web:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=http://localhost:8080
+          cache-from: type=gha,scope=web-${{ matrix.embed_dim }}
+          cache-to: type=gha,mode=max,scope=web-${{ matrix.embed_dim }}
+
+      - name: Use the CI env profile at this leg's vector width
+        # docker-compose.yml declares `env_file: .env` for the api service, so
+        # the CI profile has to land there as well as on --env-file, and the
+        # matrix width has to be written into the copy both of them read.
+        run: |
+          sed "s|^EMBED_DIM=.*|EMBED_DIM=${{ matrix.embed_dim }}|" .env.ci > .env
+          grep '^EMBED_DIM=' .env
+
+      - name: Start the stub model server
+        run: |
+          nohup python3 scripts/ci/stub_openai.py \
+            --port 4010 --embed-dim ${{ matrix.embed_dim }} > stub.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4010/v1/models >/dev/null 2>&1 && break
+            sleep 1
+          done
+          echo "--- /v1/models"
+          curl -fsS http://127.0.0.1:4010/v1/models
+          echo "--- /v1/chat/completions (plain)"
+          curl -fsS http://127.0.0.1:4010/v1/chat/completions \
+            -H 'content-type: application/json' \
+            -d '{"model":"stub-small","messages":[{"role":"user","content":"ping"}]}'
+          echo "--- /v1/embeddings (vector length, must be ${{ matrix.embed_dim }})"
+          LEN="$(curl -fsS http://127.0.0.1:4010/v1/embeddings \
+            -H 'content-type: application/json' \
+            -d '{"model":"stub-embed","input":["ping"]}' |
+            python3 -c 'import json,sys; print(len(json.load(sys.stdin)["data"][0]["embedding"]))')"
+          echo "$LEN"
+          [ "$LEN" = "${{ matrix.embed_dim }}" ] || { echo "::error::stub returned $LEN"; exit 1; }
+
+      - name: docker compose up -d (default profile, no aws)
+        # The full default stack, web included: `litellm` sits behind the `aws`
+        # profile and COMPOSE_PROFILES is unset, so it stays out.
+        run: docker compose --env-file .env up -d db seaweedfs api web
+
+      - name: Poll /health until db and s3 are ok
+        # health_ok.py exits 0 only when db and s3 are ok; it prints llm/embed
+        # too, which are reported but not required — the model here is a stub.
+        run: |
+          for i in $(seq 1 90); do
+            BODY="$(curl -fsS -m 5 http://localhost:8080/health || true)"
+            if [ -n "$BODY" ] && printf '%s' "$BODY" | python3 scripts/ci/health_ok.py; then
+              echo "healthy after ${i} poll(s)"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::/health never reported db=ok and s3=ok"
+          printf '%s' "${BODY:-<no response>}"
+          exit 1
+
+      - name: Wait for the web container to report healthy
+        # compose gates web on `api: service_healthy`, so this also proves the
+        # API healthcheck passed from inside the network, not only from the host.
+        run: |
+          for i in $(seq 1 60); do
+            STATE="$(docker compose ps web --format '{{.Health}}' 2>/dev/null || true)"
+            if [ "$STATE" = "healthy" ]; then
+              echo "web healthy after ${i} poll(s)"
+              curl -fsS -o /dev/null -w 'GET / -> %{http_code}\n' http://localhost:3001/
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::the web container never reported healthy (last state: ${STATE:-unknown})"
+          docker compose logs web --tail 50
+          exit 1
+
+      - name: scripts/smoke.sh (SMOKE_MODEL=stub)
+        # SMOKE_MODEL=stub drops the checks that assert what a model said (the
+        # fee in a chat reply, the needs_info follow-up extraction) and keeps the
+        # workflow spine: forms schema, document upload, an application filed
+        # through the inline-form path, the worker routing it to in_review, staff
+        # sign-in, two advances and the certificate PDF. It prints the list of
+        # checks it performed, so the log says exactly what this run proved.
+        env:
+          SMOKE_MODEL: stub
+          STAFF_USERNAME: staff
+          STAFF_PASSWORD: ci-not-a-real-password
+        run: bash scripts/smoke.sh http://localhost:8080
+
+      - name: 20 concurrent chat streams
+        # KNOWN FAILURE, owned by M26a. The SSE route holds a pool connection in
+        # a `yield` dependency for the life of the stream and then asks for a
+        # second, so at pool_size+max_overflow=20 every stream waits out the
+        # 30 s pool timeout and ends in the fallback apology (hostile review
+        # 2026-09-15, finding 1). M26a drops the dependency; when that merges,
+        run: |
+          python3 -m pip install --quiet httpx
+          python3 scripts/ci/concurrency_probe.py --base-url http://localhost:8080 -n 20
+
+      - name: Logs (on failure)
+        if: failure()
+        run: |
+          docker compose logs api --tail 80 || true
+          docker compose logs web --tail 30 || true
+          echo "--- stub server log"
+          tail -50 stub.log || true
+
+      - name: docker compose down -v
+        if: always()
+        run: docker compose --env-file .env down -v --remove-orphans || true

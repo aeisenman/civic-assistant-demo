@@ -1,0 +1,92 @@
+[
+  {
+    "code": "SIMPLE",
+    "name": "Simple Permit",
+    "description": "Single-trade mechanical, electrical, or plumbing permit with no plan review; often issued instantly to a licensed contractor, about 2 business days for an owner-builder.",
+    "base_fee_cents": 20000,
+    "per_1000_valuation_cents": null,
+    "typical_turnaround_days": 2,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "NOPLAN",
+    "name": "No-Plan Building Permit",
+    "description": "Like-for-like repair or replacement on an already-finaled structure (IB-203); combo permit or single-trade, about 10 business days for the historic/pre-construction check.",
+    "base_fee_cents": 41102,
+    "per_1000_valuation_cents": null,
+    "typical_turnaround_days": 10,
+    "requires_plans_over_valuation_cents": 6000000
+  },
+  {
+    "code": "BLDGPLAN",
+    "name": "Building Permit with Plans",
+    "description": "Required when a project moves walls, adds square footage, or involves major plumbing/electrical work. Fee is a valuation-based inspection fee (IB-101) plus a plan-check fee (IB-501, roughly 65-85% of the permit fee, not modeled separately here).",
+    "base_fee_cents": 25000,
+    "per_1000_valuation_cents": 1250,
+    "typical_turnaround_days": 42,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "ADU",
+    "name": "Accessory Dwelling Unit (ADU)",
+    "description": "New or converted accessory dwelling unit; total permit and impact fees typically run $6,000-$20,000. Units under 750 sq ft are exempt from development impact fees.",
+    "base_fee_cents": 350000,
+    "per_1000_valuation_cents": 0,
+    "typical_turnaround_days": 120,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "SOLAR",
+    "name": "Solar PV (Residential)",
+    "description": "Rooftop solar photovoltaic system on a single-family home or duplex; qualifying systems (<=38.4kW AC) use SolarApp+ for 1-5 day instant plan review; manual review takes 10-21 days.",
+    "base_fee_cents": 32500,
+    "per_1000_valuation_cents": null,
+    "typical_turnaround_days": 3,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "TI",
+    "name": "Tenant Improvement (Commercial)",
+    "description": "Interior build-out of an existing commercial space; projects under 20,000 sq ft with no plumbing/stair/occupancy change may qualify for the IB-150 fast track (as fast as same-day).",
+    "base_fee_cents": 20000,
+    "per_1000_valuation_cents": 1000,
+    "typical_turnaround_days": 35,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "SIGN",
+    "name": "Sign Permit",
+    "description": "Permit for a new or replacement business sign; requires a vicinity map, dimensions, and setbacks (IB-501/IB-111). Electrical or high-rise signs also require inspection.",
+    "base_fee_cents": 20000,
+    "per_1000_valuation_cents": null,
+    "typical_turnaround_days": 2,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "GRADING",
+    "name": "Grading Permit",
+    "description": "Permit for earthwork, cut/fill, or drainage grading; fee is based on valuation or cubic-yard quantity.",
+    "base_fee_cents": 15000,
+    "per_1000_valuation_cents": 800,
+    "typical_turnaround_days": 2,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "DEMO",
+    "name": "Demolition/Removal",
+    "description": "Permit to demolish or remove a structure, in part or in full; modest flat or valuation-based fee.",
+    "base_fee_cents": 15000,
+    "per_1000_valuation_cents": null,
+    "typical_turnaround_days": 3,
+    "requires_plans_over_valuation_cents": null
+  },
+  {
+    "code": "SPECIALEVENT",
+    "name": "Special Event Permit",
+    "description": "Required to host a permitted event on public property or with street closures. $341 base application fee if filed at least 60 days before the event, plus $80/business day for late filings and separate sub-permit fees (street closure, park use, amplified sound, alcohol, Police/Fire staffing).",
+    "base_fee_cents": 34100,
+    "per_1000_valuation_cents": null,
+    "typical_turnaround_days": 60,
+    "requires_plans_over_valuation_cents": null
+  }
+]

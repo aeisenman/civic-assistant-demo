@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* The design system for all three pages: one deep civic navy for chrome and
+   primary actions, one warm amber used sparingly (assistant seal, focus rings,
+   active nav underline), Tailwind's slate scale for everything neutral.
+   Imported once by app/layout.tsx. Deliberately light-only: this is projected
+   in a room and a dark-mode flip would make the demo unpredictable. */
+@theme {
+  /* Civic primary — nav, primary buttons, resident bubbles. */
+  --color-primary: #0f2f4f;
+  --color-primary-hover: #17456b;
+  --color-primary-deep: #0a2237;
+  --color-primary-soft: #eef3f8;
+
+  /* Warm accent — used sparingly: seal dot, focus ring, active nav underline. */
+  --color-accent: #d97706;
+  --color-accent-soft: #fffbeb;
+
+  /* Neutrals (Tailwind slate). */
+  --color-ink: #0f172a;
+  --color-ink-soft: #334155;
+  --color-muted: #64748b;
+  --color-rule: #e2e8f0;
+  --color-page: #f8fafc;
+  --color-surface: #ffffff;
+
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter",
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* One scale, four steps: page title / section / body / meta. */
+  --text-title: 24px;
+  --text-title--line-height: 1.25;
+  --text-title--letter-spacing: -0.01em;
+  --text-section: 16px;
+  --text-section--line-height: 1.4;
+  --text-body: 15px;
+  --text-body--line-height: 1.65;
+  --text-meta: 13px;
+  --text-meta--line-height: 1.5;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* One visible focus ring everywhere, in the accent, so keyboard users are
+   never lost. Buttons on the navy nav get the same ring against dark. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Tables: one sticky header style shared by /staff and /traces. Zebra striping
+   is applied per row in JSX, not here, so :hover and the selected row win. */
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-primary-soft);
+  color: var(--color-ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: inset 0 -1px 0 var(--color-rule);
+}
