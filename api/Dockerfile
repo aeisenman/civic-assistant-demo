@@ -7,7 +7,7 @@
 # 3.12.x slim tag on Docker Hub). `python:3.12-slim` moved under us between
 # builds, which is fine for a laptop and wrong for an image someone deploys.
 
-FROM python:3.12.14-slim AS builder
+FROM python:3.14.7-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -26,7 +26,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 
-FROM python:3.12.14-slim
+FROM python:3.14.7-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
