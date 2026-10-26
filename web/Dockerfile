@@ -5,14 +5,14 @@
 #
 # Base pinned to the exact patch (checked 2026-09-14: 22.23.2 is the newest
 # 22.x alpine tag on Docker Hub). `node:22-alpine` moved between builds.
-FROM node:22.23.2-alpine AS deps
+FROM node:22.23.4-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 # The e2e tests are a dev tool; the image must not pull a Chromium for them.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm ci
 
-FROM node:22.23.2-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -23,7 +23,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:22.23.2-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
